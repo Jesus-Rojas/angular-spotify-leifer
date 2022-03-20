@@ -9,7 +9,7 @@ const routes: Routes = [
   },
   {
     path: '', //TODO (Private) 🔴🔴
-    // component: HomePageComponent,
+    component: HomePageComponent,
     loadChildren: () => import(`./modules/home/home.module`).then(m => m.HomeModule),
     // canActivate: [SessionGuard]
   }
