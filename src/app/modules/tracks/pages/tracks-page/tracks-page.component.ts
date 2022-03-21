@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { TrackModel } from '@core/models/tracks.model';
 import { TrackService } from '@modules/tracks/services/track.service';
-import { Subscription } from 'rxjs';
+import { lastValueFrom, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-tracks-page',
@@ -16,17 +16,12 @@ export class TracksPageComponent implements OnInit {
   constructor(private trackService: TrackService) { }
 
   ngOnInit(): void {
-    // this.loadDataAll() //TODO 📌📌
-    this.trackService.getAllTracks$()
-      .subscribe( res => {
-        this.tracksTrending = res
-      })
-    // this.loadDataRandom() //TODO 📌📌
+    this.loadDataAll() //TODO 📌📌
+    this.loadDataRandom() //TODO 📌📌
   }
 
   async loadDataAll(): Promise<any> {
-    // this.tracksTrending = await this.trackService.getAllTracks$().toPromise()
-
+    this.tracksTrending = await lastValueFrom(this.trackService.getAllTracks$())
   }
 
   loadDataRandom(): void {
