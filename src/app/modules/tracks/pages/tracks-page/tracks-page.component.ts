@@ -8,28 +8,32 @@ import { Subscription } from 'rxjs';
   templateUrl: './tracks-page.component.html',
   styleUrls: ['./tracks-page.component.css']
 })
-export class TracksPageComponent implements OnInit, OnDestroy {
+export class TracksPageComponent implements OnInit {
   tracksTrending : TrackModel[]  = []
   tracksRandom : TrackModel[]  = []
   listObservers$: Subscription[] = []
 
   constructor(private trackService: TrackService) { }
 
-  ngOnDestroy(): void {
-    this.listObservers$.forEach( u => u.unsubscribe())
+  ngOnInit(): void {
+    // this.loadDataAll() //TODO 📌📌
+    this.trackService.getAllTracks$()
+      .subscribe( res => {
+        this.tracksTrending = res
+      })
+    // this.loadDataRandom() //TODO 📌📌
   }
 
-  ngOnInit(): void {
-    const observer1$ = this.trackService.dataTracksTrending$
-      .subscribe( res => {
-        this.tracksTrending = res;
-        this.tracksRandom = res;
-    })
-    const observer2$ = this.trackService.dataTracksRandom$
-      .subscribe( res => {
-        this.tracksRandom = [...this.tracksRandom, ...res];
-    })
-    this.listObservers$ = [observer1$, observer2$]
+  async loadDataAll(): Promise<any> {
+    // this.tracksTrending = await this.trackService.getAllTracks$().toPromise()
+
+  }
+
+  loadDataRandom(): void {
+    this.trackService.getAllRandom$()
+      .subscribe((response: TrackModel[]) => {
+        this.tracksRandom = response
+      })
   }
 
 }

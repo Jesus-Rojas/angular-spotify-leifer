@@ -1,7 +1,8 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { TrackModel } from '@core/models/tracks.model';
-import { Observable, of } from 'rxjs';
-import * as dataRaw from '@data/tracks.json'
+import { catchError, map, mergeMap, Observable, of } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -10,21 +11,34 @@ export class TrackService {
 
   dataTracksTrending$: Observable<TrackModel[]> = of([])
   dataTracksRandom$: Observable<TrackModel[]> = of([])
+  URL = environment.api
 
-  constructor() { 
-    const { data }: any = (dataRaw as any).default
-    this.dataTracksTrending$ = of(data)
-    this.dataTracksRandom$ = new Observable((observer) => {
-      const newTrack:TrackModel = {
-        _id: 1,
-        album: 'Red Vol.1',
-        cover: 'El retorno del Fenix',
-        name: 'Santa Flow',
-        url: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQiTVU-xvBx9ZBQ_HwVPOwwFipP3FGcaojo3Q&usqp=CAU'
-      }
-      setTimeout(() => {
-        observer.next([newTrack])
-      }, 3500);
+  constructor(private http: HttpClient) { }
+
+  private skipById(listTracks: TrackModel[], id: number): Promise<TrackModel[]> {
+    return new Promise((resolve, reject) => {
+      const listTmp = listTracks.filter(a => a._id !== id)
+      resolve(listTmp)
     })
+  }
+
+  getAllTracks$(): Observable<TrackModel[]> {
+    return this.http.get(`${this.URL}/tracks`)
+      .pipe(
+        map(({ data }: any) => {
+          return data
+        })
+      )
+  }
+
+  getAllRandom$(): Observable<any> {
+    return this.http.get(`${this.URL}/tracks`)
+      .pipe(
+        mergeMap(({ data }: any) => this.skipById(data, 2)),
+        catchError((err) => {
+          const { status, statusText } = err;
+          return of([])
+        })
+      )
   }
 }
