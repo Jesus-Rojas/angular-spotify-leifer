@@ -46,12 +46,12 @@ describe('OrderListPipe', () => {
     const lastValue = data.find((i:any) => i._id === 6)
 
     // Act
-    const result : TrackModel[] = pipe.transform(data,'name','asc')
-    const firstResult = result[0]
-    const lastResult = result[result.length - 1]
+    const result : TrackModel[] = pipe.transform(data,'name','desc')
+    const firstResult = result[result.length - 1]
+    const lastResult = result[0]
 
     // Assert
-    expect(firstValue).toEqual(lastResult);
-    expect(lastValue).toEqual(firstResult);
+    expect(firstValue).toEqual(firstResult);
+    expect(lastValue).toEqual(lastResult);
   });
 });
